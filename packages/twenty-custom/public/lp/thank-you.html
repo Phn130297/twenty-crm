@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng ký thành công - VinPeti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#08080F;--bg2:#0F0F1A;--bg3:#14141F;--gold:#D4A843;--green:#4CAF82;--text:#E8E6DC;--text-muted:#8A887C}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{max-width:600px;text-align:center}
+.success-icon{font-size:80px;margin-bottom:24px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+h1{font-size:clamp(28px,5vw,42px);font-weight:800;margin-bottom:16px;color:var(--gold)}
+.subtitle{font-size:18px;color:var(--text-muted);margin-bottom:32px}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px;text-align:left}
+.card h3{color:var(--gold);margin-bottom:12px;font-size:20px}
+.card ul{list-style:none;padding:0}
+.card li{padding:10px 0;border-bottom:1px solid var(--border-muted);display:flex;align-items:center;gap:12px}
+.card li:last-child{border-bottom:none}
+.card li::before{content:'✓';color:var(--green);font-weight:700;font-size:18px}
+.next-steps{background:linear-gradient(135deg,rgba(212,168,67,0.1),rgba(76,175,130,0.1));border:1px solid var(--gold);border-radius:16px;padding:24px;margin-bottom:24px}
+.next-steps h3{margin-bottom:12px}
+.contact-info{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.contact-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px;transition:transform .2s}
+.contact-btn:hover{transform:translateY(-2px)}
+.btn-zalo{background:#0068FF;color:white}
+.btn-phone{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+footer{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="success-icon">🎉</div>
+  <h1>ĐĂNG KÝ THÀNH CÔNG!</h1>
+  <p class="subtitle">Cảm ơn bạn đã tin tưởng VinPeti. Tôi sẽ liên hệ trong vòng 24 giờ.</p>
+
+  <div class="card">
+    <h3>📋 Những gì sẽ diễn ra tiếp theo:</h3>
+    <ul>
+      <li>Bạn nhận được <strong>email xác nhận</strong> ngay lập tức</li>
+      <li>Tôi sẽ <strong>gọi lại trong 24 giờ</strong> để tư vấn chi tiết</li>
+      <li>Nhận <strong>hướng dẫn dùng thử 14 ngày miễn phí</strong></li>
+      <li>Được <strong>training 1-1</strong> trực tiếp với tôi</li>
+    </ul>
+  </div>
+
+  <div class="next-steps">
+    <h3>🚀 Trong khi chờ gọi lại...</h3>
+    <p style="margin-bottom:8px;">Hãy chuẩn bị các thông tin sau để chúng ta tối ưu quy trình cho phòng khám của bạn:</p>
+    <ul style="list-style:none;padding:0;">
+      <li style="padding:6px 0;">• Số lượng khách hàng hiện tại / tháng</li>
+      <li style="padding:6px 0;">• Quy trình quản lý hiện tại (Excel / sổ sách / phần mềm khác)</li>
+      <li style="padding:6px 0;">• Vấn đề tốn thời gian nhất bạn muốn giải quyết</li>
+    </ul>
+  </div>
+
+  <div class="contact-info">
+    <a href="https://zalo.me/" class="contact-btn btn-zalo" target="_blank">💬 Chat Zalo ngay</a>
+    <a href="tel:" class="contact-btn btn-phone">📞 Gọi điện trực tiếp</a>
+  </div>
+
+  <footer>
+    <p>— BS. Phan Hữu Nghị | VinPeti — Phần mềm quản lý phòng khám thú y với AI</p>
+    <p style="margin-top:8px;font-size:12px;opacity:.6;">© 2025 VinPeti. All rights reserved.</p>
+  </footer>
+</div>
+
+<script>
+// Track conversion
+console.log('[THANKYOU] Conversion tracked');
+</script>
+</body>
+</html>

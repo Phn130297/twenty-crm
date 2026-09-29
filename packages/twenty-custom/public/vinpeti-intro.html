@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VinPeti — Phần mềm quản lý phòng khám thú y thông minh</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; background: #fff; overflow-x: hidden; }
+  
+  /* Nav */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,.85); backdrop-filter: blur(16px); border-bottom: 1px solid #f1f5f9; }
+  nav .logo { font-size: 1.4em; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+  nav .logo span { background: linear-gradient(135deg,#6366f1,#ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  nav .nav-links { display: flex; gap: 32px; align-items: center; }
+  nav .nav-links a { text-decoration: none; color: #475569; font-size: .9em; font-weight: 500; transition: color .2s; }
+  nav .nav-links a:hover { color: #6366f1; }
+  .btn { padding: 10px 24px; border-radius: 50px; font-weight: 600; font-size: .9em; cursor: pointer; border: none; transition: all .3s; text-decoration: none; display: inline-block; }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; box-shadow: 0 4px 16px rgba(99,102,241,.3); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,.4); }
+  .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
+  .btn-outline:hover { border-color: #6366f1; color: #6366f1; }
+  .btn-large { padding: 14px 36px; font-size: 1.05em; }
+  .btn-white { background: white; color: #6366f1; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+
+  /* Hero */
+  .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 120px 20px 80px; background: linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%); position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,102,241,.15), transparent 70%); top: -200px; right: -200px; }
+  .hero::after { content: ''; position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(236,72,153,.1), transparent 70%); bottom: -200px; left: -200px; }
+  .hero-content { position: relative; z-index: 1; max-width: 800px; }
+  .hero-badge { display: inline-block; padding: 6px 16px; background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3); border-radius: 50px; font-size: .8em; color: #a5b4fc; margin-bottom: 24px; }
+  .hero h1 { font-size: clamp(2.2em, 5vw, 3.8em); font-weight: 800; color: white; line-height: 1.15; margin-bottom: 20px; }
+  .hero h1 span { background: linear-gradient(135deg,#818cf8,#f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: clamp(1em, 2vw, 1.2em); color: #94a3b8; line-height: 1.7; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .hero-stats { display: flex; gap: 48px; justify-content: center; margin-top: 60px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-size: 2em; font-weight: 800; color: white; }
+  .hero-stat .label { font-size: .85em; color: #64748b; margin-top: 4px; }
+
+  /* Sections */
+  section { padding: 80px 20px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .section-title { text-align: center; margin-bottom: 56px; }
+  .section-title h2 { font-size: clamp(1.5em, 3vw, 2.2em); font-weight: 700; margin-bottom: 12px; }
+  .section-title p { color: #64748b; font-size: 1.05em; max-width: 600px; margin: 0 auto; }
+  .section-title .badge { display: inline-block; padding: 4px 14px; background: #eef2ff; color: #6366f1; border-radius: 50px; font-size: .8em; font-weight: 600; margin-bottom: 12px; }
+
+  /* Features */
+  .features { background: #f8fafc; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .feature-card { background: white; border-radius: 20px; padding: 32px; border: 1px solid #f1f5f9; transition: all .3s; }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.06); border-color: #e0e7ff; }
+  .feature-card .icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; margin-bottom: 20px; }
+  .feature-card h3 { font-size: 1.1em; font-weight: 600; margin-bottom: 10px; }
+  .feature-card p { color: #64748b; font-size: .9em; line-height: 1.6; }
+
+  /* Pricing */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+  .pricing-card { background: white; border-radius: 24px; padding: 40px 32px; border: 1px solid #f1f5f9; text-align: center; transition: all .3s; position: relative; }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+  .pricing-card.featured { border: 2px solid #6366f1; box-shadow: 0 8px 32px rgba(99,102,241,.15); }
+  .pricing-card .badge-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; padding: 4px 20px; border-radius: 50px; font-size: .8em; font-weight: 600; }
+  .pricing-card h3 { font-size: 1.3em; margin-bottom: 8px; }
+  .pricing-card .desc { color: #64748b; font-size: .9em; margin-bottom: 20px; }
+  .pricing-card .price { font-size: 2.8em; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+  .pricing-card .price span { font-size: .35em; font-weight: 500; color: #94a3b8; }
+  .pricing-card .period { color: #94a3b8; font-size: .85em; margin-bottom: 24px; }
+  .pricing-card ul { list-style: none; text-align: left; margin: 24px 0; }
+  .pricing-card li { padding: 8px 0; color: #475569; font-size: .9em; border-bottom: 1px solid #f8fafc; }
+  .pricing-card li::before { content: "✅ "; }
+
+  /* Testimonials */
+  .testimonials { background: #f8fafc; }
+  .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .testimonial-card { background: white; border-radius: 20px; padding: 32px; border: 1px solid #f1f5f9; }
+  .testimonial-card .stars { color: #f59e0b; font-size: 1.1em; margin-bottom: 12px; }
+  .testimonial-card p { color: #475569; font-size: .9em; line-height: 1.6; font-style: italic; margin-bottom: 16px; }
+  .testimonial-card .author { display: flex; align-items: center; gap: 12px; }
+  .testimonial-card .author .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#ec4899); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: .9em; }
+  .testimonial-card .author .name { font-weight: 600; font-size: .9em; }
+  .testimonial-card .author .role { color: #94a3b8; font-size: .8em; }
+
+  /* CTA */
+  .cta-section { background: linear-gradient(135deg,#0f172a,#1e1b4b); text-align: center; padding: 100px 20px; }
+  .cta-section h2 { font-size: clamp(1.5em, 3vw, 2.5em); color: white; margin-bottom: 16px; }
+  .cta-section p { color: #94a3b8; font-size: 1.1em; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+  /* Footer */
+  footer { background: #0f172a; border-top: 1px solid #1e293b; padding: 40px 20px; text-align: center; color: #64748b; font-size: .85em; }
+  footer a { color: #94a3b8; text-decoration: none; }
+  footer a:hover { color: #818cf8; }
+
+  @media (max-width: 768px) {
+    nav { padding: 12px 16px; }
+    nav .nav-links { display: none; }
+    .hero { padding: 100px 16px 60px; }
+    .hero-stats { gap: 24px; }
+    .features-grid, .testimonial-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 350px; }
+    .pricing-card.featured { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="logo">🐾 <span>VinPeti</span></div>
+  <div class="nav-links">
+    <a href="#features">Tính năng</a>
+    <a href="#pricing">Bảng giá</a>
+    <a href="#testimonials">Đánh giá</a>
+    <a href="#contact" class="btn btn-primary">Dùng thử miễn phí</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Ra mắt 2025 — Đã có mặt tại Tây Ninh</div>
+    <h1>Phòng khám thú y<br><span>thông minh với AI</span></h1>
+    <p>VinPeti là phần mềm quản lý phòng khám thú y toàn diện, được xây dựng từ thực tế hơn 5 năm kinh nghiệm của bác sĩ thú y tại Tây Ninh. Tích hợp AI Agent tự động — giúp bạn quản lý phòng khám hiệu quả hơn bao giờ hết.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary btn-large">🚀 Dùng thử miễn phí</a>
+      <a href="#features" class="btn btn-outline btn-large" style="border-color:rgba(255,255,255,.2);color:white">Xem tính năng</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">500+</div><div class="label">Ca khám/tháng</div></div>
+      <div class="hero-stat"><div class="num">98%</div><div class="label">Hài lòng</div></div>
+      <div class="hero-stat"><div class="num">35+</div><div class="label">Tính năng</div></div>
+      <div class="hero-stat"><div class="num">24/7</div><div class="label">AI hỗ trợ</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-title">
+      <div class="badge">⚡ Tính năng nổi bật</div>
+      <h2>Mọi thứ bạn cần để quản lý phòng khám</h2>
+      <p>VinPeti tích hợp đầy đủ các công cụ từ quản lý bệnh án, tồn kho, tài chính đến AI tự động chăm sóc khách hàng</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon" style="background:#eef2ff;color:#6366f1">🤖</div>
+        <h3>AI Agent tự động</h3>
+        <p>AI tự động tư vấn, nhắc lịch tái khám, chăm sóc khách hàng qua Telegram 24/7 — tiết kiệm đến 70% thời gian</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon" style="background:#fce7f3;color:#ec4899">📋</div>
+        <h3>Hồ sơ bệnh án điện tử</h3>
+        <p>Lưu trữ đầy đủ lịch sử khám, chẩn đoán, đơn thuốc, xét nghiệm của từng bệnh nhân — tra cứu trong 2 giây</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon" style="background:#d1fae5;color:#22c55e">💊</div>
+        <h3>Quản lý tồn kho thông minh</h3>
+        <p>Theo dõi thuốc, vật tư, cảnh báo hết hạn, cảnh báo sắp hết hàng — tự động cập nhật tồn kho khi bán</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon" style="background:#fef3c7;color:#f59e0b">📊</div>
+        <h3>Báo cáo tài chính toàn diện</h3>
+        <p>Doanh thu, chi phí, công nợ, lợi nhuận theo ngày/tuần/tháng — biết ngay phòng khám đang lời hay lỗ</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon" style="background:#ede9fe;color:#a855f7">📅</div>
+        <h3>Đặt lịch & Nhắc hẹn</h3>
+        <p>Khách đặt lịch online, tự động nhắc qua Telegram/Zalo — giảm tỷ lệ quên lịch đến 90%</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon" style="background:#dbeafe;color:#3b82f6">🔗</div>
+        <h3>Kết nối Telegram CRM</h3>
+        <p>Quản lý phòng khám qua Telegram: xem lịch, tạo đơn, kiểm tra tồn kho, báo cáo — mọi lúc mọi nơi</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-title">
+      <div class="badge">💰 Bảng giá</div>
+      <h2>Lựa chọn gói phù hợp với bạn</h2>
+      <p>Dùng thử miễn phí 14 ngày — không cần thẻ tín dụng</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>AI Agent</h3>
+        <div class="desc">Cho phòng khám muốn thử nghiệm AI</div>
+        <div class="price">6.000.000<span>đ</span></div>
+        <div class="period">/tháng</div>
+        <ul>
+          <li>AI Agent tư vấn tự động</li>
+          <li>Quản lý khách hàng cơ bản</li>
+          <li>Báo cáo doanh thu</li>
+          <li>Telegram bot hỗ trợ</li>
+          <li>Nhắc lịch tự động</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%">Dùng thử</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="badge-popular">🔥 Phổ biến nhất</div>
+        <h3>Bundle trọn gói</h3>
+        <div class="desc">Toàn bộ tính năng, không giới hạn</div>
+        <div class="price">30.000.000<span>đ</span></div>
+        <div class="period">(một lần — sở hữu vĩnh viễn)</div>
+        <ul>
+          <li>Trọn bộ phần mềm 35+ tính năng</li>
+          <li>AI Agent + Telegram bot</li>
+          <li>Quản lý tồn kho, công nợ</li>
+          <li>Hồ sơ bệnh án điện tử</li>
+          <li>Hỗ trợ cài đặt & training 24/7</li>
+          <li>Miễn phí nâng cấp trọn đời</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary" style="width:100%">Mua ngay</a>
+      </div>
+      <div class="pricing-card">
+        <h3>Trial</h3>
+        <div class="desc">Trải nghiệm miễn phí</div>
+        <div class="price">0<span>đ</span></div>
+        <div class="period">14 ngày dùng thử</div>
+        <ul>
+          <li>Toàn bộ tính năng Bundle</li>
+          <li>Hỗ trợ cài đặt</li>
+          <li>Không cần thẻ tín dụng</li>
+          <li>Tự động nâng cấp khi hết hạn</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%">🆓 Dùng thử ngay</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="section-title">
+      <div class="badge">💬 Khách hàng nói gì</div>
+      <h2>Được tin dùng bởi các phòng khám thú y</h2>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"Từ ngày dùng VinPeti, tôi không còn mất cả buổi tối để ngồi nhập liệu nữa. AI tự động nhắn tin nhắc lịch và tư vấn cho khách, khách hàng rất hài lòng."</p>
+        <div class="author">
+          <div class="avatar">BS</div>
+          <div><div class="name">BS. Nguyễn Văn A</div><div class="role">Phòng khám PetCare, TP.HCM</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"Báo cáo doanh thu theo ngày/tuần/tháng giúp tôi biết chính xác phòng khám đang lời bao nhiêu. Quản lý tồn kho thuốc chưa bao giờ dễ đến thế."</p>
+        <div class="author">
+          <div class="avatar">TL</div>
+          <div><div class="name">Thái Văn L</div><div class="role">Phòng khám Thú y Tây Ninh</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"Telegram bot là thứ tôi thích nhất! Chỉ cần nhắn tin trên Telegram là xem được lịch hẹn, công nợ, thậm chí tạo đơn — làm việc mọi lúc mọi nơi."</p>
+        <div class="author">
+          <div class="avatar">MT</div>
+          <div><div class="name">Mai Thanh T</div><div class="role">Animal Clinic, Đà Nẵng</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>Bắt đầu ngay hôm nay</h2>
+  <p>Dùng thử miễn phí 14 ngày — không cần thẻ tín dụng. Cài đặt trong vòng 30 phút.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a href="#" class="btn btn-white btn-large">📞 0989.xxx.xxx</a>
+    <a href="#" class="btn btn-outline btn-large" style="border-color:rgba(255,255,255,.2);color:white">📧 vinpeti@email.com</a>
+  </div>
+  <p style="margin-top:24px;font-size:.85em;color:#64748b">Hoặc liên hệ qua Telegram: @vinpeti_bot</p>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2025 <a href="#">VinPeti</a> — Phần mềm quản lý phòng khám thú y thông minh với AI</p>
+  <p style="margin-top:8px">🏥 Tây Ninh, Việt Nam</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thanh toán | Cẩm nang 100+ Bệnh Chó</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+body{background:#f8fafc;color:#1e293b;line-height:1.6}
+.hero{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff;padding:60px 20px;text-align:center}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
+.hero p{color:#94a3b8;font-size:1rem;max-width:600px;margin:0 auto}
+.content{max-width:600px;margin:0 auto;padding:40px 20px}
+.bank-card{background:#fff;border-radius:16px;padding:28px;border:1px solid #e2e8f0;margin-bottom:20px}
+.bank-card h2{font-size:1.2rem;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.bank-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f1f5f9;font-size:.95rem}
+.bank-row:last-child{border:none}
+.bank-label{color:#64748b;font-weight:500}
+.bank-value{color:#1e293b;font-weight:600;text-align:right;max-width:60%}
+.bank-value.copy{cursor:pointer;color:#3b82f6}
+.bank-value.copy:hover{text-decoration:underline}
+.qr-section{text-align:center;padding:20px 0}
+.qr-img{max-width:220px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px}
+.qr-note{font-size:.85rem;color:#64748b}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:24px 0}
+.step{background:#fff;border-radius:12px;padding:20px;border:1px solid #e2e8f0;text-align:center}
+.step-icon{font-size:1.8rem;margin-bottom:8px}
+.step h3{font-size:1rem;color:#1e293b;margin-bottom:6px}
+.step p{font-size:.85rem;color:#64748b;line-height:1.5}
+.confirm-btn{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:24px;transition:.2s;text-decoration:none;text-align:center}
+.confirm-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(34,197,94,.3)}
+.note{background:#dbeafe;border-radius:12px;padding:20px;color:#1e4e8a;font-size:.9rem;line-height:1.6;margin-top:20px}
+.back{display:inline-block;margin-top:24px;color:#3b82f6;text-decoration:none;font-weight:600}
+.back:hover{text-decoration:underline}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:8px;font-size:.9rem;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:768px){.hero h1{font-size:1.6rem}.steps{grid-template-columns:1fr}.bank-row{flex-direction:column;gap:4px}.bank-value{text-align:left;max-width:100%}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <h1>Thanh toán & Nhận Tài Liệu</h1>
+  <p>Hoàn tất thanh toán để nhận bộ tài liệu 100+ Bệnh Phổ Biến Trên Chó</p>
+</section>
+<section class="content">
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">💳</div>
+      <h3>Chuyển khoản</h3>
+      <p>Chuyển khoản theo thông tin bên dưới hoặc quét mã QR</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">📸</div>
+      <h3>Xác nhận</h3>
+      <p>Bấm nút xác nhận đã chuyển khoản bên dưới</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">📧</div>
+      <h3>Nhận tài liệu</h3>
+      <p>Tài liệu PDF sẽ được gửi qua email trong vòng 24h</p>
+    </div>
+  </div>
+
+  <div class="bank-card">
+    <h2>🏦 Thông tin chuyển khoản</h2>
+    <div class="bank-row">
+      <span class="bank-label">Ngân hàng</span>
+      <span class="bank-value">MB Bank</span>
+    </div>
+    <div class="bank-row">
+      <span class="bank-label">Chủ tài khoản</span>
+      <span class="bank-value">Phan Hữu Nghị</span>
+    </div>
+    <div class="bank-row">
+      <span class="bank-label">Số tài khoản</span>
+      <span class="bank-value copy" onclick="copyText('0362727920', this)">0362727920 📋</span>
+    </div>
+    <div class="bank-row">
+      <span class="bank-label">Số tiền</span>
+      <span class="bank-value">49,000 VNĐ</span>
+    </div>
+    <div class="bank-row">
+      <span class="bank-label">Nội dung CK</span>
+      <span class="bank-value copy" onclick="copyText('BSTY VinPeti', this)">BSTY VinPeti 📋</span>
+    </div>
+  </div>
+
+  <div class="bank-card qr-section">
+    <h2 style="justify-content:center;margin-bottom:12px">📱 Quét mã QR thanh toán</h2>
+    <img class="qr-img" src="https://qr.sepay.vn/img?acc=0362727920&bank=MB&amount=49000&des=BSTY%2520VinPeti" alt="QR thanh toán MB Bank" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=bank://mb/0362727920/49000/BSTY%2520VinPeti'">
+    <p class="qr-note">Mở app ngân hàng → Quét mã QR → Chuyển khoản</p>
+  </div>
+
+  <button class="confirm-btn" onclick="confirmPayment()">Đã chuyển khoản — Xác nhận</button>
+
+  <div class="note">
+    <strong>Lưu ý:</strong> Sau khi chuyển khoản, bấm nút xác nhận bên trên. Tài liệu PDF sẽ được gửi đến email đăng ký trong vòng 24 giờ. Nếu không nhận được email, vui lòng kiểm tra thư mục spam hoặc liên hệ support@vinpeti.com.
+  </div>
+  <a href="/" class="back">← Quay về trang chủ</a>
+</section>
+<div class="toast" id="toast"></div>
+<script>
+function copyText(t, el){
+  navigator.clipboard.writeText(t).then(function(){
+    var toast=document.getElementById('toast');
+    toast.textContent='Đã sao chép: '+t;
+    toast.classList.add('show');
+    setTimeout(function(){toast.classList.remove('show')},2000);
+  });
+}
+function confirmPayment(){
+  var name=prompt('Nhập họ tên để xác nhận:');
+  if(!name)return;
+  fetch('/api/landing/payment-confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,source:'benh-cho-landing'})})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d.success){window.location.href='/lp/benh-cho/cam-on.html'}
+    else{alert('Có lỗi xảy ra, vui lòng thử lại')}
+  })
+  .catch(function(){window.location.href='/lp/benh-cho/cam-on.html'});
+}
+</script>
+</body>
+</html>

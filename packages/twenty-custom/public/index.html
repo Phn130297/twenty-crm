@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VinPeti CRM Dashboard</title>
+<style>
+  :root {
+    --bg: #0f172a; --bg2: #1e293b; --bg3: #334155;
+    --text: #f1f5f9; --text2: #94a3b8;
+    --accent: #6366f1; --accent2: #818cf8;
+    --green: #22c55e; --red: #ef4444; --yellow: #eab308;
+    --orange: #f97316; --pink: #ec4899;
+    --radius: 12px; --shadow: 0 4px 24px rgba(0,0,0,.2);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+  
+  /* Sidebar */
+  .sidebar { width: 240px; background: var(--bg2); padding: 24px 0; display: flex; flex-direction: column; border-right: 1px solid var(--bg3); flex-shrink: 0; }
+  .sidebar .logo { padding: 0 20px 24px; font-size: 1.3em; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .sidebar .logo span { background: linear-gradient(135deg,var(--accent),var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sidebar .logo small { font-size: .5em; color: var(--text2); -webkit-text-fill-color: var(--text2); display: block; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: var(--text2); cursor: pointer; transition: all .2s; border-left: 3px solid transparent; text-decoration: none; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: rgba(99,102,241,.15); color: var(--accent2); border-left-color: var(--accent); }
+  .nav-item .ico { width: 20px; text-align: center; font-size: 1.1em; }
+  
+  /* Main */
+  .main { flex:1; padding: 24px 32px; overflow-y: auto; max-height: 100vh; }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .header h1 { font-size: 1.5em; font-weight: 600; }
+  .header .status { display: flex; align-items: center; gap: 8px; font-size: .85em; color: var(--text2); }
+  .header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .header .dot.error { background: var(--red); }
+  
+  /* Stats cards */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat { background: var(--bg2); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .stat .label { font-size: .85em; color: var(--text2); margin-bottom: 8px; }
+  .stat .value { font-size: 1.6em; font-weight: 700; }
+  .stat .sub { font-size: .8em; color: var(--text2); margin-top: 4px; }
+  .stat.purple .value { color: var(--accent2); }
+  .stat.green .value { color: var(--green); }
+  .stat.blue .value { color: #60a5fa; }
+  .stat.orange .value { color: var(--orange); }
+  .stat.pink .value { color: var(--pink); }
+  
+  /* Content sections */
+  .section { display: none; }
+  .section.active { display: block; }
+  .card { background: var(--bg2); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 1.1em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card .actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  
+  /* Buttons */
+  .btn { padding: 8px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: .9em; font-weight: 500; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-sm { padding: 6px 12px; font-size: .8em; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { opacity: .9; }
+  .btn-red { background: var(--red); color: white; }
+  .btn-outline { background: transparent; border: 1px solid var(--bg3); color: var(--text2); }
+  .btn-outline:hover { background: var(--bg3); color: var(--text); }
+  
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: .9em; }
+  th { text-align: left; padding: 12px 8px; color: var(--text2); font-weight: 500; border-bottom: 1px solid var(--bg3); font-size: .85em; text-transform: uppercase; letter-spacing: .5px; }
+  td { padding: 12px 8px; border-bottom: 1px solid rgba(51,65,85,.5); }
+  tr:hover td { background: rgba(99,102,241,.05); }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .75em; font-weight: 500; }
+  .badge-green { background: rgba(34,197,94,.15); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,.15); color: var(--red); }
+  .badge-yellow { background: rgba(234,179,8,.15); color: var(--yellow); }
+  .badge-purple { background: rgba(99,102,241,.15); color: var(--accent2); }
+  
+  /* Forms */
+  input, textarea, select { width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--bg3); border-radius: 8px; color: var(--text); font-size: .9em; margin-bottom: 12px; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg2); border: 1px solid var(--bg3); padding: 12px 20px; border-radius: 10px; box-shadow: var(--shadow); transform: translateY(100px); opacity: 0; transition: all .3s; z-index: 200; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid var(--red); }
+  
+  /* Utilities */
+  .empty-state { text-align: center; padding: 24px; color: var(--text2); }
+  .empty-state .icon { font-size: 2em; margin-bottom: 8px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .kpi-card { background: var(--bg); border-radius: 10px; padding: 14px; }
+  .kpi-card .lbl { font-size: .85em; color: var(--text2); margin-bottom: 6px; }
+  .kpi-card .num { font-size: 1.4em; font-weight: 700; }
+  
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar { width: 60px; padding: 16px 0; }
+    .sidebar .logo span, .sidebar .logo small, .nav-item span { display: none; }
+    .nav-item { justify-content: center; border-left: none; }
+    .nav-item.active { border-left: none; border-bottom: 2px solid var(--accent); }
+    .main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div><span>VinPeti</span><small>CRM Dashboard</small></div>
+  </div>
+  <a class="nav-item active" data-tab="overview"><span class="ico">📊</span><span>Tổng quan</span></a>
+  <a class="nav-item" data-tab="tags"><span class="ico">🏷️</span><span>Tags</span></a>
+  <a class="nav-item" data-tab="landing"><span class="ico">📄</span><span>Landing Page</span></a>
+  <a class="nav-item" data-tab="email"><span class="ico">📧</span><span>Email Marketing</span></a>
+  <a class="nav-item" data-tab="payment"><span class="ico">💳</span><span>Thanh toán</span></a>
+  <a class="nav-item" data-tab="telegram"><span class="ico">🤖</span><span>Telegram</span></a>
+  <a class="nav-item" data-tab="vinpeti"><span class="ico">🔗</span><span>VinPeti Sync</span></a>
+  <a class="nav-item" data-tab="kpi"><span class="ico">📈</span><span>KPI</span></a>
+  <a class="nav-item" data-tab="leads"><span class="ico">🎯</span><span>Leads</span></a>
+  <a class="nav-item" data-tab="inventory"><span class="ico">📦</span><span>Kho & Đơn</span></a>
+  <a class="nav-item" data-tab="sequences"><span class="ico">🔁</span><span>Drip Email</span></a>
+  <a class="nav-item" data-tab="workflow"><span class="ico">⚙️</span><span>Workflow</span></a>
+</div>
+
+<!-- Main -->
+<div class="main" id="app">
+  <div class="header">
+    <h1 id="pageTitle">📊 Tổng quan</h1>
+    <div class="status">
+      <span class="dot" id="healthDot"></span>
+      <span id="healthText">Đang kiểm tra...</span>
+      <span style="margin-left:12px;font-size:.8em;color:var(--text2)" id="uptimeDisplay"></span>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="section active" id="sect-overview">
+    <div class="stats">
+      <div class="stat purple"><div class="label">🧾 Doanh thu</div><div class="value" id="ovRevenue">0₫</div><div class="sub">Tổng pipeline</div></div>
+      <div class="stat green"><div class="label">📝 Deal đang mở</div><div class="value" id="ovDeals">0</div><div class="sub">Cơ hội kinh doanh</div></div>
+      <div class="stat blue"><div class="label">👥 Khách hàng</div><div class="value" id="ovContacts">0</div><div class="sub">Tổng contacts</div></div>
+      <div class="stat orange"><div class="label">📧 Email sent</div><div class="value" id="ovEmails">0</div><div class="sub">Chiến dịch</div></div>
+    </div>
+    <div class="card">
+      <h2>🚀 Quick Actions</h2>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="switchTab('landing')">+ Tạo Landing Page</button>
+        <button class="btn btn-green" onclick="switchTab('email')">📧 Tạo Email Campaign</button>
+        <button class="btn btn-outline" onclick="switchTab('payment')">💰 Tạo Thanh toán</button>
+        <button class="btn btn-outline" onclick="switchTab('vinpeti')">🔄 Sync VinPeti</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📈 Pipeline Forecast</h2>
+      <div id="forecastDisplay">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="lbl">Giá trị pipeline</div><div class="num" id="fcPipeline">0₫</div></div>
+          <div class="kpi-card"><div class="lbl">Deal đang mở</div><div class="num" id="fcDeals">0</div></div>
+          <div class="kpi-card"><div class="lbl">Trung bình/deal</div><div class="num" id="fcAvg">0₫</div></div>
+          <div class="kpi-card"><div class="lbl">Dự báo 30 ngày</div><div class="num" id="fcProjected">0₫</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tags -->
+  <div class="section" id="sect-tags">
+    <div class="card">
+      <h2>🏷️ Gắn Tag</h2>
+      <div class="form-row">
+        <div><label>Entity Type</label><select id="tagType"><option value="contact">Contact</option><option value="deal">Deal</option></select></div>
+        <div><label>Entity ID</label><input id="tagEntityId" placeholder="kh001, deal123..."></div>
+      </div>
+      <div class="form-row">
+        <div><label>Tên Tag</label><input id="tagName" placeholder="VIP, Thân thiết..."></div>
+        <div><label>Màu</label><input id="tagColor" type="color" value="#6366f1"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addTag()">➕ Thêm Tag</button>
+    </div>
+    <div class="card">
+      <h2>📋 Tags đã gắn</h2>
+      <div class="actions"><input id="tagSearchEntity" placeholder="Nhập Entity ID để tra..." style="max-width:300px;"></div>
+      <div id="tagList"><div class="empty-state"><div class="icon">🏷️</div><p>Nhập Entity ID và bấm Tra cứu</p></div></div>
+      <button class="btn btn-outline btn-sm" onclick="searchTags()">🔍 Tra cứu</button>
+    </div>
+  </div>
+
+  <!-- Landing -->
+  <div class="section" id="sect-landing">
+    <div class="card">
+      <h2>🌐 Domain công khai</h2>
+      <p style="color:var(--text2);margin-bottom:12px">Domain phục vụ landing page + link tracking email. Nhập domain (vd <code>crm.vinpeti.vn</code>), URL LP published + link email sẽ dùng domain này.</p>
+      <div class="form-row">
+        <div><label>Public domain</label><input id="domainInput" placeholder="crm.vinpeti.vn"></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveDomain()">💾 Lưu domain</button>
+      <div style="margin-top:12px"><span id="domainStatus" class="badge badge-yellow">Chưa cấu hình</span> <span style="margin-left:8px;color:var(--text2)">URL hiện: <code id="domainPreview">—</code></span></div>
+      <p style="margin-top:12px;color:var(--text2);font-size:13px">⚠ Cần trỏ DNS A record domain về máy này + reverse proxy (Caddy/nginx) forward <code>domain → :4000</code> để link thật truy cập được.</p>
+    </div>
+    <div class="card">
+      <h2>📄 Tạo Landing Page</h2>
+      <div class="form-row">
+        <div><label>Tên</label><input id="lpName" placeholder="VinPeti Pro"></div>
+        <div><label>Title</label><input id="lpTitle" placeholder="Phần mềm quản lý phòng khám"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Preset</label><select id="lpPreset"></select></div>
+        <div><label>Brief (mỗi dòng 1 ý)</label><textarea id="lpBrief" placeholder="AI Agent tự động&#10;Quản lý khách hàng&#10;Báo cáo doanh thu"></textarea></div>
+      </div>
+      <button class="btn btn-primary" onclick="createLanding()">🚀 Tạo Landing Page</button>
+    </div>
+    <div class="card">
+      <h2>📋 Landing Pages</h2>
+      <table><thead><tr><th>Tên</th><th>Slug</th><th>Preset</th><th>Status</th><th></th></tr></thead><tbody id="lpTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="section" id="sect-email">
+    <div class="card">
+      <h2>🔌 Kết nối nhà cung cấp email</h2>
+      <p style="color:var(--text2);margin-bottom:12px">Chọn dịch vụ gửi email: Resend, SendGrid hoặc SendoBox. Nhập API key, dùng cho mọi chiến dịch + email welcome.</p>
+      <div class="form-row">
+        <div><label>Nhà cung cấp</label>
+          <select id="emlProvider">
+            <option value="resend">Resend</option>
+            <option value="sendgrid">SendGrid</option>
+            <option value="sendobox">SendoBox</option>
+          </select>
+        </div>
+        <div><label>From email</label><input id="emlFrom" placeholder="VinPeti <onboarding@resend.dev>"></div>
+      </div>
+      <div class="form-row">
+        <div><label>API key</label><input id="emlApiKey" type="password" placeholder="re_xxx / SG.xxx / token"></div>
+        <div><label>Email nhận test</label><input id="emlTestTo" placeholder="ban@mail.com"></div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveEmailProvider()">💾 Lưu cấu hình</button>
+        <button class="btn btn-outline" onclick="testEmailProvider()">✉️ Gửi email test</button>
+      </div>
+      <div style="margin-top:12px"><span id="emlStatus" class="badge badge-yellow">Chưa cấu hình</span> <span style="margin-left:8px;color:var(--text2)">Key: <code id="emlKeyMasked">—</code></span></div>
+    </div>
+    <div class="card">
+      <h2>📧 Tạo Campaign</h2>
+      <div class="form-row">
+        <div><label>Tên Campaign</label><input id="campName" placeholder="Khuyến mãi tháng 8"></div>
+        <div><label>Subject</label><input id="campSubject" placeholder="🔥 Giảm giá đặc biệt"></div>
+      </div>
+      <div><label>Email nhận (cách nhau bằng dấu phẩy)</label><input id="campEmails" placeholder="khach1@mail.com, khach2@mail.com"></div>
+      <button class="btn btn-primary" onclick="createCampaign()">📧 Tạo Campaign</button>
+    </div>
+    <div class="card">
+      <h2>📋 Templates có sẵn</h2>
+      <div id="emailTemplates"></div>
+    </div>
+    <div class="card">
+      <h2>📋 Campaigns</h2>
+      <table><thead><tr><th>Tên</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Status</th></tr></thead><tbody id="campTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Payment -->
+  <div class="section" id="sect-payment">
+    <div class="card">
+      <h2>🔌 Kết nối SePay</h2>
+      <p style="color:var(--text2);margin-bottom:12px">SePay tự động đối soát thanh toán ngân hàng. Lấy API token tại <code>my.sepay.vn → Company Settings → API Access</code>. Khi có giao dịch, SePay gọi webhook → cập nhật giao dịch pending → tạo deal.</p>
+      <div class="form-row">
+        <div><label>API token</label><input id="sepToken" type="password" placeholder="Bearer token"></div>
+        <div><label>Webhook secret (HMAC)</label><input id="sepWhSecret" type="password" placeholder="whsec_... (tùy chọn)"></div>
+      </div>
+      <div class="form-row">
+        <div><label>API base URL</label><input id="sepApiUrl" placeholder="https://userapi.sepay.vn"></div>
+        <div><label>Bank account ID (tạo webhook)</label><input id="sepBankAcct" placeholder="19 (để trống = all)"></div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveSepay()">💾 Lưu</button>
+        <button class="btn btn-outline" onclick="testSepay()">🔌 Test kết nối</button>
+        <button class="btn btn-outline" onclick="createSepayWebhook()">🪝 Tạo webhook SePay</button>
+      </div>
+      <div style="margin-top:12px">
+        <span id="sepStatus" class="badge badge-yellow">Chưa cấu hình</span>
+        <span style="margin-left:8px;color:var(--text2)">Token: <code id="sepTokenMask">—</code> | Webhook URL: <code id="sepWhUrl">—</code></span>
+      </div>
+      <div style="margin-top:12px">
+        <h3 style="font-size:14px;margin-bottom:8px">Giao dịch gần đây từ SePay</h3>
+        <table><thead><tr><th>Ngày</th><th>TK</th><th>Số tiền</th><th>Nội dung</th><th>Mã</th></tr></thead><tbody id="sepTxnTable"></tbody></table>
+      </div>
+    </div>
+    <div class="card">
+      <h2>💳 Tạo thanh toán</h2>
+      <div class="form-row">
+        <div><label>Số tiền (VND)</label><input id="payAmount" type="number" placeholder="6000000" value="6000000"></div>
+        <div><label>Tên khách</label><input id="payName" placeholder="Bác sĩ Nghị"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Phone</label><input id="payPhone" placeholder="0901234567"></div>
+        <div><label>Email</label><input id="payEmail" placeholder="bs@vinpeti.vn"></div>
+      </div>
+      <button class="btn btn-primary" onclick="createPayment()">💰 Tạo VietQR</button>
+    </div>
+    <div class="card">
+      <h2>📋 Giao dịch</h2>
+      <div id="qrPreview" style="display:none;text-align:center;margin-bottom:16px"></div>
+      <table><thead><tr><th>ID</th><th>Số tiền</th><th>Phương thức</th><th>Trạng thái</th><th>Deal</th><th>Ngày</th></tr></thead><tbody id="payTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>📅 Trả góp (Installments)</h2>
+      <div class="form-row">
+        <div><label>Tên khách</label><input id="instName" placeholder="Phòng khám An Thú"></div>
+        <div><label>Tổng tiền</label><input id="instTotal" type="number" placeholder="18000000"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Số kỳ</label><input id="instCount" type="number" placeholder="3" value="3"></div>
+        <div><label>Khoảng (ngày)</label><input id="instInterval" type="number" placeholder="30" value="30"></div>
+        <div><label>Email</label><input id="instEmail" placeholder="bs@vinpeti.vn"></div>
+      </div>
+      <button class="btn btn-primary" onclick="createInstallment()">📅 Tạo kế hoạch trả góp</button>
+    </div>
+    <div class="card">
+      <h2>📋 Kế hoạch trả góp</h2>
+      <table><thead><tr><th>Khách</th><th>Tổng</th><th>Kỳ</th><th>Đã trả</th><th>Tiến độ</th><th>Còn lại</th><th>Deal</th><th>Trạng thái</th></tr></thead><tbody id="instTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>🔢 Chi tiết kỳ trả (nhập Plan ID)</h2>
+      <div class="form-row">
+        <div><label>Plan ID</label><input id="instPlanId" placeholder="inst_xxx"></div>
+        <button class="btn btn-outline" onclick="loadInstallmentDetail()">🔍 Xem</button>
+      </div>
+      <table><thead><tr><th>Kỳ</th><th>Số tiền</th><th>Content</th><th>Trạng thái</th><th>Hạn</th><th>QR</th></tr></thead><tbody id="instDetailTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Telegram -->
+  <div class="section" id="sect-telegram">
+    <div class="card">
+      <h2>🤖 Cấu hình Telegram Bot</h2>
+      <div><label>Bot Token</label><input id="tgToken" placeholder="Nhập token từ @BotFather" type="password"></div>
+      <button class="btn btn-primary" onclick="initTelegram()">🚀 Khởi tạo Bot</button>
+      <div style="margin-top:12px"><span id="tgStatus" class="badge badge-red">Chưa kết nối</span></div>
+    </div>
+    <div class="card">
+      <h2>📤 Gửi tin nhắn</h2>
+      <div class="form-row">
+        <div><label>Chat ID</label><input id="tgChatId" placeholder="Nhóm hoặc user ID"></div>
+        <div><label>Nội dung</label><textarea id="tgMsg" placeholder="Nội dung tin nhắn..."></textarea></div>
+      </div>
+      <button class="btn btn-primary" onclick="sendTelegram()">📤 Gửi</button>
+    </div>
+  </div>
+
+  <!-- VinPeti Sync -->
+  <div class="section" id="sect-vinpeti">
+    <div class="card">
+      <h2>🔗 Cấu hình VinPeti Bridge</h2>
+      <div class="form-row">
+        <div><label>API URL</label><input id="vpUrl" value="http://localhost:8000" placeholder="http://localhost:8000"></div>
+        <div><label>API Key</label><input id="vpKey" placeholder="API key (nếu có)" type="password"></div>
+      </div>
+      <button class="btn btn-primary" onclick="configVinpeti()">💾 Lưu cấu hình</button>
+    </div>
+    <div class="card">
+      <h2>🔄 Đồng bộ</h2>
+      <button class="btn btn-green" onclick="syncContacts()">🔄 Đồng bộ Contacts từ VinPeti</button>
+      <div id="vpResult" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h2>📋 Lịch sử Sync</h2>
+      <table><thead><tr><th>Twenty ID</th><th>VinPeti ID</th><th>Loại</th><th>Status</th><th>Lúc</th></tr></thead><tbody id="vpTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="section" id="sect-kpi">
+    <div class="card">
+      <h2>📊 KPI Snapshot</h2>
+      <button class="btn btn-primary" onclick="refreshKPI()">🔄 Lấy KPI mới nhất</button>
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card"><div class="lbl">Tổng doanh thu</div><div class="num" id="kpiRevenue">—</div></div>
+        <div class="kpi-card"><div class="lbl">Tổng số deal</div><div class="num" id="kpiDeals">—</div></div>
+        <div class="kpi-card"><div class="lbl">Tổng contacts</div><div class="num" id="kpiContacts">—</div></div>
+        <div class="kpi-card"><div class="lbl">Giá trị TB/deal</div><div class="num" id="kpiAvg">—</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🏆 Top Customers</h2>
+      <table><thead><tr><th>#</th><th>Tên</th><th>Ngày tạo</th></tr></thead><tbody id="topCustTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Leads -->
+  <div class="section" id="sect-leads">
+    <div class="stats">
+      <div class="stat purple"><div class="label">🎯 Tổng lead</div><div class="value" id="leadTotal">0</div><div class="sub">Từ landing page</div></div>
+      <div class="stat green"><div class="label">✅ Đã sync</div><div class="value" id="leadSynced">0</div><div class="sub">Vào Twenty CRM</div></div>
+      <div class="stat blue"><div class="label">⏳ Đang xử lý</div><div class="value" id="leadPending">0</div><div class="sub">Queued / local</div></div>
+      <div class="stat orange"><div class="label">📧 Có email</div><div class="value" id="leadEmail">0</div><div class="sub">Để gửi marketing</div></div>
+    </div>
+    <div class="card">
+      <h2>🎯 Danh sách lead mới</h2>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="loadLeads()">🔄 Làm mới</button>
+        <button class="btn btn-green" onclick="retryPending()">🔁 Retry sync pending</button>
+      </div>
+      <table><thead><tr><th>#</th><th>Họ tên</th><th>SĐT</th><th>Email</th><th>Phòng khám</th><th>Trạng thái</th><th>Thời gian</th></tr></thead><tbody id="leadTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Inventory -->
+  <div class="section" id="sect-inventory">
+    <div class="stats">
+      <div class="stat blue"><div class="label">📦 Sản phẩm</div><div class="value" id="invProdCount">0</div></div>
+      <div class="stat orange"><div class="label">⚠️ Sắp hết</div><div class="value" id="invLow">0</div><div class="sub">Dưới mức đặt lại</div></div>
+      <div class="stat yellow"><div class="label">🗓️ Lô sắp hết hạn</div><div class="value" id="invExp">0</div><div class="sub">30 ngày</div></div>
+      <div class="stat green"><div class="label">💰 Lợi nhuận</div><div class="value" id="invProfit">0₫</div><div class="sub">Tổng</div></div>
+    </div>
+    <div class="card">
+      <h2>📦 Thêm sản phẩm</h2>
+      <div class="form-row">
+        <div><label>Tên</label><input id="invName" placeholder="Vaccine dại"></div>
+        <div><label>SKU</label><input id="invSku" placeholder="tự sinh nếu trống"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Giá bán (VND)</label><input id="invPrice" type="number" placeholder="150000"></div>
+        <div><label>Giá vốn (VND)</label><input id="invCost" type="number" placeholder="90000"></div>
+        <div><label>Tồn kho</label><input id="invStock" type="number" placeholder="0" value="0"></div>
+        <div><label>Mức đặt lại</label><input id="invReorder" type="number" placeholder="3" value="3"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Đơn vị</label><input id="invUnit" placeholder="liều" value="cái"></div>
+        <div><label>Danh mục</label><input id="invCat" placeholder="Vaccine"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addProduct()">➕ Thêm sản phẩm</button>
+    </div>
+    <div class="card">
+      <h2>📋 Sản phẩm & tồn kho</h2>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadProducts()">🔄 Làm mới</button></div>
+      <table><thead><tr><th>Tên</th><th>SKU</th><th>Giá bán</th><th>Vốn</th><th>Tồn</th><th>Đặt lại</th><th>Lãi/giá</th></tr></thead><tbody id="invTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>🧾 Tạo đơn hàng</h2>
+      <div class="form-row">
+        <div><label>Khách</label><input id="ordCustomer" placeholder="Phòng khám XYZ"></div>
+        <div><label>Ghi chú</label><input id="ordNote" placeholder=""></div>
+      </div>
+      <div><label>Line items (mỗi dòng: productId,qty  |  cách nhau dấu phẩy)</label><textarea id="ordItems" rows="3" placeholder="local_xxx,2"></textarea></div>
+      <button class="btn btn-green" onclick="createOrder()">🧾 Tạo đơn (trừ kho, sync deal)</button>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadOrders()">🔄 Tải đơn</button></div>
+      <table><thead><tr><th>Khách</th><th>SP</th><th>SL</th><th>Tổng</th><th>Lợi nhuận</th><th>Trạng thái</th><th>Ngày</th></tr></thead><tbody id="ordTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>📅 Lô sắp hết hạn</h2>
+      <table><thead><tr><th>Sản phẩm</th><th>Batch</th><th>SL</th><th>Hết hạn</th><th>Còn (ngày)</th></tr></thead><tbody id="expTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Sequences -->
+  <div class="section" id="sect-sequences">
+    <div class="stats">
+      <div class="stat blue"><div class="label">🔁 Đang nurture</div><div class="value" id="seqActive">0</div></div>
+      <div class="stat green"><div class="label">✅ Hoàn thành</div><div class="value" id="seqDone">0</div></div>
+      <div class="stat orange"><div class="label">📧 Đã gửi</div><div class="value" id="seqSent">0</div></div>
+    </div>
+    <div class="card">
+      <h2>🔁 Drip Sequences</h2>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadSequences()">🔄 Làm mới</button></div>
+      <table><thead><tr><th>Tên</th><th>Trigger</th><th>Steps</th><th>Đã enroll</th><th>Bật</th></tr></thead><tbody id="seqTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>👤 Enrollments</h2>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadEnrollments()">🔄 Tải</button></div>
+      <table><thead><tr><th>Khách</th><th>Email</th><th>Step</th><th>Trạng thái</th><th>Step kế</th><th>Đã gửi</th></tr></thead><tbody id="enrTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Workflow -->
+  <div class="section" id="sect-workflow">
+    <div class="card">
+      <h2>⚙️ Tạo Workflow Rule</h2>
+      <div class="form-row">
+        <div><label>Tên rule</label><input id="wfName" placeholder="Lead → Telegram"></div>
+        <div><label>Trigger</label><select id="wfTrigger"><option value="lead_created">lead_created</option><option value="payment_completed">payment_completed</option><option value="deal_won">deal_won</option><option value="contact_tagged">contact_tagged</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label>Action</label><select id="wfAction"><option value="notify_telegram">notify_telegram</option><option value="send_email">send_email</option><option value="create_deal">create_deal</option><option value="enroll_sequence">enroll_sequence</option><option value="tag_contact">tag_contact</option></select></div>
+        <div><label>Params (JSON)</label><input id="wfParams" placeholder='{"message":"Lead mới"}'></div>
+      </div>
+      <button class="btn btn-primary" onclick="createWorkflowRule()">⚙️ Tạo rule</button>
+    </div>
+    <div class="card">
+      <h2>📋 Rules</h2>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadWorkflowRules()">🔄 Tải</button></div>
+      <table><thead><tr><th>Tên</th><th>Trigger</th><th>Actions</th><th>Runs</th><th>Bật</th><th></th></tr></thead><tbody id="wfTable"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>🏃 Runs gần đây</h2>
+      <div class="actions"><button class="btn btn-outline btn-sm" onclick="loadWorkflowRuns()">🔄 Tải</button></div>
+      <table><thead><tr><th>Rule</th><th>Trigger</th><th>Trạng thái</th><th>Lỗi</th><th>Thời gian</th></tr></thead><tbody id="wfRunsTable"></tbody></table>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const API = '';
+let presets = [];
+
+// Navigation
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => switchTab(el.dataset.tab));
+});
+function switchTab(tab) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`sect-${tab}`).classList.add('active');
+  const titles = {overview:'📊 Tổng quan',tags:'🏷️ Tags',landing:'📄 Landing Page',email:'📧 Email Marketing',payment:'💳 Thanh toán',telegram:'🤖 Telegram',vinpeti:'🔗 VinPeti Sync',kpi:'📈 KPI',leads:'🎯 Leads'};
+  document.getElementById('pageTitle').textContent = titles[tab] || tab;
+  loadTab(tab);
+}
+
+function loadTab(tab) {
+  if (tab === 'landing') loadLandings();
+  else if (tab === 'email') { loadEmailProvider(); loadTemplates(); loadCampaigns(); }
+  else if (tab === 'payment') { loadPayments(); loadInstallments(); loadSepay(); }
+  else if (tab === 'vinpeti') { loadVinpetiStatus(); loadSyncRecords(); }
+  else if (tab === 'kpi') { refreshKPI(); loadTopCustomers(); }
+  else if (tab === 'overview') refreshOverview();
+  else if (tab === 'tags') { loadPresets(); }
+  else if (tab === 'leads') { loadLeads(); }
+  else if (tab === 'inventory') { loadProducts(); loadOrders(); loadExpiring(); loadInvStats(); }
+  else if (tab === 'sequences') { loadSequences(); loadEnrollments(); loadSeqStats(); }
+  else if (tab === 'workflow') { loadWorkflowRules(); loadWorkflowRuns(); }
+}
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type}`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ====== HEALTH ======
+async function checkHealth() {
+  try {
+    const r = await fetch(`${API}/healthz`);
+    const d = await r.json();
+    document.getElementById('healthDot').className = 'dot';
+    document.getElementById('healthText').textContent = `Healthy - ${d.modules.length} modules`;
+    document.getElementById('uptimeDisplay').textContent = `Uptime: ${Math.floor(d.uptime)}s`;
+    return true;
+  } catch(e) {
+    document.getElementById('healthDot').className = 'dot error';
+    document.getElementById('healthText').textContent = 'Offline';
+    return false;
+  }
+}
+
+// ====== OVERVIEW ======
+async function refreshOverview() {
+  try {
+    const kpi = await (await fetch(`${API}/api/dashboard/kpi`)).json();
+    document.getElementById('ovRevenue').textContent = (kpi.totalRevenue || 0).toLocaleString() + '₫';
+    document.getElementById('ovDeals').textContent = kpi.totalDeals || 0;
+    document.getElementById('ovContacts').textContent = kpi.totalContacts || 0;
+    const stats = await (await fetch(`${API}/api/email/stats`)).json();
+    document.getElementById('ovEmails').textContent = stats.totalSent || 0;
+
+    const fc = await (await fetch(`${API}/api/dashboard/forecast`)).json();
+    document.getElementById('fcPipeline').textContent = (fc.pipelineValue || 0).toLocaleString() + '₫';
+    document.getElementById('fcDeals').textContent = fc.openDeals || 0;
+    document.getElementById('fcAvg').textContent = (fc.averageDealSize || 0).toLocaleString() + '₫';
+    document.getElementById('fcProjected').textContent = (fc.projectedRevenue || 0).toLocaleString() + '₫';
+  } catch(e) { console.error(e); }
+}
+
+// ====== TAGS ======
+function searchTags() {
+  const id = document.getElementById('tagSearchEntity').value || document.getElementById('tagEntityId').value;
+  if (!id) return toast('Nhập Entity ID','error');
+  const type = document.getElementById('tagType').value;
+  fetch(`${API}/api/tags/${type}/${id}`).then(r=>r.json()).then(d => {
+    const el = document.getElementById('tagList');
+    if (!d.tags || d.tags.length === 0) {
+      el.innerHTML = `<div class="empty-state"><p>Chưa có tag nào cho <code>${type}:${id}</code></p></div>`;
+    } else {
+      el.innerHTML = `<p style="margin-bottom:8px;color:var(--text2)">Tags cho <strong>${type}:${id}</strong>:</p>` +
+        d.tags.map(t => `<span class="tag" style="background:${t.color}22;color:${t.color};border:1px solid ${t.color}44">${t.name}</span>`).join('');
+    }
+  }).catch(e => toast(e.message,'error'));
+}
+
+async function addTag() {
+  const type = document.getElementById('tagType').value;
+  const id = document.getElementById('tagEntityId').value;
+  const tag = document.getElementById('tagName').value;
+  const color = document.getElementById('tagColor').value;
+  if (!id || !tag) return toast('Nhập Entity ID và Tag','error');
+  try {
+    const r = await fetch(`${API}/api/tags/${type}/${id}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tag, color})});
+    const d = await r.json();
+    if (d.success) { toast(`✅ Đã gắn tag "${tag}"`); searchTags(); }
+    else toast(d.error,'error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ====== LANDING ======
+async function loadPresets() {
+  try {
+    const r = await fetch(`${API}/api/landing/presets`);
+    presets = await r.json();
+    const sel = document.getElementById('lpPreset');
+    sel.innerHTML = presets.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  } catch(e) {}
+}
+
+async function createLanding() {
+  const body = {
+    name: document.getElementById('lpName').value,
+    title: document.getElementById('lpTitle').value || document.getElementById('lpName').value,
+    brief: document.getElementById('lpBrief').value,
+    presetId: document.getElementById('lpPreset').value
+  };
+  if (!body.name) return toast('Nhập tên Landing Page','error');
+  try {
+    const r = await fetch(`${API}/api/landing`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    toast(`✅ Landing "${d.name}" created! ID: ${d.id}`);
+    loadLandings();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadLandings() {
+  loadDomain();
+  try {
+    const r = await fetch(`${API}/api/landing`);
+    const list = await r.json();
+    const tbody = document.getElementById('lpTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Chưa có landing page nào</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.map(lp => `<tr>
+      <td><strong>${lp.name}</strong></td>
+      <td>${lp.slug}</td>
+      <td>${lp.presetId || '—'}</td>
+      <td><span class="badge ${lp.published ? 'badge-green' : 'badge-yellow'}">${lp.published ? '✅ Published' : '📝 Draft'}</span></td>
+      <td><button class="btn btn-sm btn-outline" onclick="publishLanding('${lp.id}')">${lp.published ? '🔗 View' : '📢 Publish'}</button></td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+async function publishLanding(id) {
+  try {
+    const r = await fetch(`${API}/api/landing/${id}/publish`, {method:'POST'});
+    const d = await r.json();
+    if (d.success) { toast(`✅ Published at ${d.url}`); loadLandings(); }
+    else toast(d.error,'error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ====== EMAIL ======
+async function loadTemplates() {
+  try {
+    const r = await fetch(`${API}/api/email/templates`);
+    const list = await r.json();
+    document.getElementById('emailTemplates').innerHTML = list.map(t => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--bg3)">
+        <strong>${t.name}</strong> <span class="badge badge-purple">${t.category}</span>
+        <div style="color:var(--text2);font-size:.85em;margin-top:4px">📧 ${t.subject}</div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+async function createCampaign() {
+  const body = {
+    name: document.getElementById('campName').value,
+    subject: document.getElementById('campSubject').value,
+    recipientEmails: document.getElementById('campEmails').value.split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  if (!body.name || !body.subject) return toast('Nhập tên và subject','error');
+  try {
+    const r = await fetch(`${API}/api/email/campaigns`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    toast(`✅ Campaign "${d.name}" created!`);
+    loadCampaigns();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadCampaigns() {
+  try {
+    const r = await fetch(`${API}/api/email/campaigns`);
+    const list = await r.json();
+    const tbody = document.getElementById('campTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Chưa có campaign</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.map(c => `<tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.subject}</td>
+      <td>${c.sentCount || 0}</td>
+      <td>${c.openCount || 0}</td>
+      <td><span class="badge ${c.status==='sent'?'badge-green':c.status==='sending'?'badge-yellow':'badge-purple'}">${c.status}</span></td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+// ====== PAYMENT ======
+async function createPayment() {
+  const body = {
+    amount: parseInt(document.getElementById('payAmount').value),
+    name: document.getElementById('payName').value,
+    phone: document.getElementById('payPhone').value,
+    email: document.getElementById('payEmail').value
+  };
+  if (!body.amount || !body.name) return toast('Nhập số tiền và tên','error');
+  try {
+    const r = await fetch(`${API}/api/payment/create`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    const preview = document.getElementById('qrPreview');
+    preview.style.display = 'block';
+    preview.innerHTML = `<p style="margin-bottom:8px">✅ VietQR cho <strong>${(d.amount).toLocaleString()}₫</strong></p>
+      <img src="${d.qrBase64}" style="width:200px;border-radius:12px;border:2px solid var(--bg3)"><br>
+      <small style="color:var(--text2)">Nội dung CK: <code>${d.content}</code></small>`;
+    toast(`✅ VietQR created: ${(d.amount).toLocaleString()}₫`);
+    loadPayments();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadPayments() {
+  try {
+    const r = await fetch(`${API}/api/payment`);
+    const list = await r.json();
+    const tbody = document.getElementById('payTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Chưa có giao dịch</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.map(p => `<tr>
+      <td><code>${p.id.slice(0,12)}...</code></td>
+      <td><strong>${(p.amount).toLocaleString()}₫</strong></td>
+      <td>${p.method}</td>
+      <td><span class="badge ${p.status==='paid'?'badge-green':'badge-yellow'}">${p.status}</span></td>
+      <td>${p.dealId?`<code>${p.dealId.slice(-8)}</code>`:'—'}</td>
+      <td>${new Date(p.createdAt).toLocaleDateString('vi-VN')}</td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+// ====== INSTALLMENTS ======
+const vnd = n => (n||0).toLocaleString() + '₫';
+
+async function createInstallment() {
+  const body = {
+    name: document.getElementById('instName').value,
+    totalAmount: parseInt(document.getElementById('instTotal').value),
+    count: parseInt(document.getElementById('instCount').value),
+    intervalDays: parseInt(document.getElementById('instInterval').value),
+    email: document.getElementById('instEmail').value
+  };
+  if (!body.name || !body.totalAmount || !body.count) return toast('Nhập tên, tổng, kỳ','error');
+  try {
+    const r = await fetch(`${API}/api/payment/installments`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    toast(`✅ Kế hoạch ${d.plan.count} kỳ × ${vnd(d.perInstallment)} (Deal ${d.dealId?d.dealId.slice(-8):'N/A'})`);
+    document.getElementById('instPlanId').value = d.plan.id;
+    loadInstallments(); loadInstallmentDetail();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadInstallments() {
+  try {
+    const list = await (await fetch(`${API}/api/payment/installments`)).json();
+    const tbody = document.getElementById('instTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>Chưa có kế hoạch trả góp</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.map(p => `<tr>
+      <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:var(--text2)"><code>${p.id}</code></small></td>
+      <td><strong>${vnd(p.totalAmount)}</strong></td>
+      <td>${p.paidCount}/${p.count}</td>
+      <td>${vnd(p.paidAmount)}</td>
+      <td style="color:var(--blue)">${p.progress}%</td>
+      <td>${vnd(p.remaining)}</td>
+      <td>${p.dealId?`<code>${p.dealId.slice(-8)}</code>`:'—'}</td>
+      <td><span class="badge ${p.status==='completed'?'badge-green':p.status==='defaulted'?'badge-red':'badge-yellow'}">${p.status}</span></td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+async function loadInstallmentDetail() {
+  const planId = document.getElementById('instPlanId').value.trim();
+  if (!planId) return toast('Nhập Plan ID','error');
+  try {
+    const d = await (await fetch(`${API}/api/payment/installments/${planId}`)).json();
+    if (!d.plan) throw new Error('Không tìm thấy');
+    const tbody = document.getElementById('instDetailTable');
+    tbody.innerHTML = d.installments.map(t => `<tr>
+      <td><strong>#${t.installmentNo}</strong></td>
+      <td>${vnd(t.amount)}</td>
+      <td><code>${t.content}</code></td>
+      <td><span class="badge ${t.status==='completed'?'badge-green':'badge-yellow'}">${t.status==='completed'?'đã trả':'chờ'}</span></td>
+      <td>${t.dueDate?new Date(t.dueDate).toLocaleDateString('vi-VN'):'—'}</td>
+      <td>${t.status!=='completed'?`<button class="btn btn-outline btn-sm" onclick="genInstQR('${planId}',${t.installmentNo})">QR</button>`:'—'}</td>
+    </tr>`).join('');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function genInstQR(planId, no) {
+  try {
+    const r = await fetch(`${API}/api/payment/installments/${planId}/${no}/qr`, {method:'POST'});
+    const d = await r.json();
+    const preview = document.getElementById('qrPreview');
+    preview.style.display = 'block';
+    preview.innerHTML = `<p style="margin-bottom:8px">✅ QR kỳ #${no}: <strong>${vnd(d.amount)}</strong> (hạn ${d.dueDate?d.dueDate.slice(0,10):'—'})</p>
+      <img src="${d.qrBase64}" style="width:200px;border-radius:12px;border:2px solid var(--bg3)"><br>
+      <small style="color:var(--text2)">Nội dung: <code>${d.content}</code></small>`;
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ====== TELEGRAM ======
+async function initTelegram() {
+  const token = document.getElementById('tgToken').value;
+  if (!token) return toast('Nhập Bot Token','error');
+  try {
+    const r = await fetch(`${API}/api/telegram/init`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token})});
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('tgStatus').className = 'badge badge-green';
+      document.getElementById('tgStatus').textContent = '✅ Bot đã kết nối';
+      toast('✅ Telegram Bot initialized!');
+    } else toast(d.error,'error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function sendTelegram() {
+  const chatId = document.getElementById('tgChatId').value;
+  const text = document.getElementById('tgMsg').value;
+  if (!chatId || !text) return toast('Nhập Chat ID và nội dung','error');
+  try {
+    const r = await fetch(`${API}/api/telegram/send`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chatId, text})});
+    const d = await r.json();
+    if (d.success) toast('✅ Đã gửi!');
+    else toast(d.error,'error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ====== VINPETI ======
+async function configVinpeti() {
+  const apiUrl = document.getElementById('vpUrl').value;
+  const apiKey = document.getElementById('vpKey').value;
+  try {
+    const r = await fetch(`${API}/api/vinpeti/config`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({apiUrl, apiKey})});
+    const d = await r.json();
+    if (d.success) toast('✅ Cấu hình đã lưu');
+    else toast(d.error,'error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function syncContacts() {
+  const btn = event.target; btn.disabled = true; btn.textContent = '⏳ Đang sync...';
+  try {
+    const r = await fetch(`${API}/api/vinpeti/sync/contacts`, {method:'POST'});
+    const d = await r.json();
+    document.getElementById('vpResult').innerHTML = `<div style="background:var(--bg);padding:12px;border-radius:8px">
+      ✅ Synced <strong>${d.synced}</strong> contacts<br>
+      <small>${(d.results || []).filter(x=>x.status==='synced').length} synced, ${(d.results || []).filter(x=>x.status==='error').length} errors</small>
+    </div>`;
+    toast(`✅ Sync hoàn tất: ${d.synced} contacts`);
+    loadSyncRecords();
+  } catch(e) { toast(e.message,'error'); }
+  finally { btn.disabled = false; btn.textContent = '🔄 Đồng bộ Contacts từ VinPeti'; }
+}
+
+async function loadVinpetiStatus() {
+  try {
+    const r = await fetch(`${API}/api/vinpeti/status`);
+    const d = await r.json();
+  } catch(e) {}
+}
+
+async function loadSyncRecords() {
+  try {
+    const r = await fetch(`${API}/api/vinpeti/records`);
+    const list = await r.json();
+    const tbody = document.getElementById('vpTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Chưa sync lần nào</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.slice().reverse().slice(0,20).map(s => `<tr>
+      <td><code>${(s.twentyId || '').slice(0,12)}...</code></td>
+      <td>${s.vinpetiId}</td>
+      <td>${s.entityType}</td>
+      <td><span class="badge ${s.status==='synced'?'badge-green':'badge-red'}">${s.status}</span></td>
+      <td>${new Date(s.lastSyncedAt).toLocaleString('vi-VN')}</td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+// ====== KPI ======
+async function refreshKPI() {
+  try {
+    const r = await fetch(`${API}/api/dashboard/kpi`);
+    const d = await r.json();
+    document.getElementById('kpiRevenue').textContent = (d.totalRevenue || 0).toLocaleString() + '₫';
+    document.getElementById('kpiDeals').textContent = d.totalDeals || 0;
+    document.getElementById('kpiContacts').textContent = d.totalContacts || 0;
+    document.getElementById('kpiAvg').textContent = (d.averageDealValue || 0).toLocaleString() + '₫';
+    toast('✅ KPI updated');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadTopCustomers() {
+  try {
+    const r = await fetch(`${API}/api/dashboard/top-customers`);
+    const list = await r.json();
+    const tbody = document.getElementById('topCustTable');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state"><p>Chưa có dữ liệu</p></div></td></tr>'; return; }
+    tbody.innerHTML = list.map((c,i) => `<tr><td>${i+1}</td><td>${c.name}</td><td>${new Date(c.createdAt).toLocaleDateString('vi-VN')}</td></tr>`).join('');
+  } catch(e) {}
+}
+
+// ====== LEADS ======
+const STATUS_LABELS = {
+  received: '🟡 Received',
+  syncing: '🔵 Syncing',
+  synced: '🟢 Synced',
+  contact_only: '🟡 Contact only',
+  queued: '🟠 Queued',
+  local_only: '🔴 Local only',
+  unknown: '⚪ Unknown'
+};
+
+async function loadLeads() {
+  try {
+    const r = await fetch(`${API}/api/dashboard/leads`);
+    const list = await r.json();
+    const tbody = document.getElementById('leadTable');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Chưa có lead nào</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = list.map((lead, idx) => {
+        const status = STATUS_LABELS[lead.status] || STATUS_LABELS.unknown;
+        return `<tr>
+          <td>${idx + 1}</td>
+          <td><strong>${escapeHtml(lead.name)}</strong></td>
+          <td>${escapeHtml(lead.phone)}</td>
+          <td>${escapeHtml(lead.email || '—')}</td>
+          <td>${escapeHtml(lead.clinic || '—')}</td>
+          <td><span class="badge ${lead.status === 'synced' ? 'badge-green' : lead.status === 'queued' || lead.status === 'local_only' ? 'badge-red' : 'badge-yellow'}">${status}</span></td>
+          <td>${new Date(lead.timestamp).toLocaleString('vi-VN')}</td>
+        </tr>`;
+      }).join('');
+    }
+    await loadLeadStats();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadLeadStats() {
+  try {
+    const r = await fetch(`${API}/api/dashboard/leads/stats`);
+    const s = await r.json();
+    document.getElementById('leadTotal').textContent = s.total || 0;
+    document.getElementById('leadSynced').textContent = s.synced || 0;
+    const pending = (s.queued || 0) + (s.local_only || 0) + (s.received || 0) + (s.syncing || 0);
+    document.getElementById('leadPending').textContent = pending;
+    document.getElementById('leadEmail').textContent = s.withEmail || 0;
+  } catch(e) {}
+}
+
+async function retryPending() {
+  try {
+    const r = await fetch(`${API}/api/landing/retry-pending`, {method: 'POST'});
+    const d = await r.json();
+    toast(`✅ Retry ${d.processed}: ${d.synced} synced`);
+    loadLeads();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ====== INVENTORY ======
+const invVnd = n => (n||0).toLocaleString() + '₫';
+
+async function loadInvStats() {
+  try {
+    const lo = await (await fetch(`${API}/api/inventory/low-stock`)).json();
+    const ex = await (await fetch(`${API}/api/inventory/expiring?days=30`)).json();
+    const pr = await (await fetch(`${API}/api/dashboard/profit`)).json();
+    document.getElementById('invProdCount').textContent = (await (await fetch(`${API}/api/inventory/products`)).json()).length;
+    document.getElementById('invLow').textContent = lo.length;
+    document.getElementById('invExp').textContent = ex.length;
+    document.getElementById('invProfit').textContent = invVnd(pr.summary?.profit);
+  } catch(e) {}
+}
+
+async function addProduct() {
+  const body = {
+    name: invName.value, sku: invSku.value,
+    price: +invPrice.value || 0, cost: +invCost.value || 0,
+    stockQty: +invStock.value || 0, reorderPoint: +invReorder.value || 0,
+    unit: invUnit.value || 'cái', category: invCat.value || ''
+  };
+  if (!body.name) return toast('Cần tên sản phẩm','error');
+  try {
+    const r = await fetch(`${API}/api/inventory/products`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    toast(`✅ Đã thêm ${d.name} (tồn ${d.stockQty})`);
+    ['invName','invSku','invPrice','invCost','invCat'].forEach(i=>document.getElementById(i).value='');
+    loadProducts(); loadInvStats();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadProducts() {
+  try {
+    const list = await (await fetch(`${API}/api/inventory/products`)).json();
+    invTable.innerHTML = list.map(p => `<tr>
+      <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:var(--text2)">${escapeHtml(p.twentyId)}</small></td>
+      <td>${escapeHtml(p.sku||'')}</td>
+      <td>${invVnd(p.price)}</td>
+      <td>${invVnd(p.cost)}</td>
+      <td>${p.stockQty}</td>
+      <td>${p.reorderPoint}</td>
+      <td style="color:var(--green)">${invVnd(p.price - p.cost)} (${Math.round((p.price-p.cost)/(p.price||1)*100)}%)</td>
+    </tr>`).join('') || '<tr><td colspan="7"><div class="empty-state"><p>Chưa có sản phẩm</p></div></td></tr>';
+  } catch(e) {}
+}
+
+async function loadExpiring() {
+  try {
+    const list = await (await fetch(`${API}/api/inventory/expiring?days=30`)).json();
+    expTable.innerHTML = list.map(l => `<tr>
+      <td>${escapeHtml(l.productName)}</td>
+      <td>${escapeHtml(l.batchNo)}</td>
+      <td>${l.quantity}</td>
+      <td>${l.expiryDate.slice(0,10)}</td>
+      <td style="color:${l.expired?'var(--red)':'var(--yellow)'}">${l.daysLeft}</td>
+    </tr>`).join('') || '<tr><td colspan="5"><div class="empty-state"><p>Không có lô sắp hết hạn</p></div></td></tr>';
+  } catch(e) {}
+}
+
+async function createOrder() {
+  const items = ordItems.value.trim().split(',').filter(Boolean).map(line => {
+    const [pid, qty] = line.trim().split(/\s*[|\s]\s*/);
+    return { productId: pid.trim(), qty: +qty || 1 };
+  });
+  if (!items.length) return toast('Nhập line items','error');
+  try {
+    const r = await fetch(`${API}/api/inventory/orders`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      customerName: ordCustomer.value, note: ordNote.value, items, status:'paid'
+    })});
+    const d = await r.json();
+    toast(`✅ Đơn ${d.id.slice(-6)}: ${invVnd(d.total)} (lãi ${invVnd(d.profit)})`);
+    ordItems.value=''; ordCustomer.value=''; ordNote.value='';
+    loadOrders(); loadInvStats();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadOrders() {
+  try {
+    const list = await (await fetch(`${API}/api/inventory/orders`)).json();
+    ordTable.innerHTML = list.map(o => `<tr>
+      <td>${escapeHtml(o.customerName)}</td>
+      <td>${o.items.map(i=>escapeHtml(i.name)).join(', ')}</td>
+      <td>${o.items.reduce((s,i)=>s+i.qty,0)}</td>
+      <td>${invVnd(o.total)}</td>
+      <td style="color:var(--green)">${invVnd(o.profit)}</td>
+      <td><span class="badge ${o.status==='paid'?'badge-green':o.status==='cancelled'?'badge-red':'badge-yellow'}">${o.status}</span></td>
+      <td>${new Date(o.createdAt).toLocaleDateString('vi-VN')}</td>
+    </tr>`).join('') || '<tr><td colspan="7"><div class="empty-state"><p>Chưa có đơn</p></div></td></tr>';
+  } catch(e) {}
+}
+
+// ====== SEQUENCES ======
+async function loadSeqStats() {
+  try {
+    const s = await (await fetch(`${API}/api/sequence/stats`)).json();
+    seqActive.textContent = s.active;
+    seqDone.textContent = s.completed;
+    seqSent.textContent = s.totalSent;
+  } catch(e) {}
+}
+
+async function loadSequences() {
+  try {
+    const list = await (await fetch(`${API}/api/sequence/`)).json();
+    seqTable.innerHTML = list.map(sq => `<tr>
+      <td><strong>${escapeHtml(sq.name)}</strong></td>
+      <td>${sq.trigger}</td>
+      <td>${sq.steps.length} bước</td>
+      <td>${sq.enrolledCount}</td>
+      <td><span class="badge ${sq.enabled?'badge-green':'badge-red'}">${sq.enabled?'bật':'tắt'}</span></td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+async function loadEnrollments() {
+  try {
+    const list = await (await fetch(`${API}/api/sequence/enrollments`)).json();
+    enrTable.innerHTML = list.map(e => `<tr>
+      <td>${escapeHtml(e.contactName)}</td>
+      <td>${escapeHtml(e.email)}</td>
+      <td>${e.currentStep}</td>
+      <td><span class="badge ${e.status==='active'?'badge-green':e.status==='completed'?'badge-yellow':'badge-red'}">${e.status}</span></td>
+      <td>${e.nextFireAt ? new Date(e.nextFireAt).toLocaleString('vi-VN') : '—'}</td>
+      <td>${e.history.length}</td>
+    </tr>`).join('') || '<tr><td colspan="6"><div class="empty-state"><p>Chưa enroll</p></div></td></tr>';
+  } catch(e) {}
+}
+
+// ====== WORKFLOW ======
+async function createWorkflowRule() {
+  let params = {};
+  try { params = JSON.parse(wfParams.value || '{}'); } catch { return toast('Params JSON sai','error'); }
+  try {
+    const r = await fetch(`${API}/api/workflow/rules`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name: wfName.value, trigger: wfTrigger.value,
+      actions: [{ type: wfAction.value, params }]
+    })});
+    const d = await r.json();
+    toast(`✅ Rule "${d.name}" đã tạo`);
+    wfName.value=''; wfParams.value='';
+    loadWorkflowRules();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadWorkflowRules() {
+  try {
+    const list = await (await fetch(`${API}/api/workflow/rules`)).json();
+    wfTable.innerHTML = list.map(r => `<tr>
+      <td><strong>${escapeHtml(r.name)}</strong></td>
+      <td>${r.trigger}</td>
+      <td>${r.actions.map(a=>a.type).join(', ')}</td>
+      <td>${r.runCount}</td>
+      <td><span class="badge ${r.enabled?'badge-green':'badge-red'}">${r.enabled?'bật':'tắt'}</span></td>
+      <td>${r.enabled?`<button class="btn btn-outline btn-sm" onclick="toggleRule('${r.id}',false)">tắt</button>`:`<button class="btn btn-outline btn-sm" onclick="toggleRule('${r.id}',true)">bật</button>`} <button class="btn btn-outline btn-sm" onclick="deleteRule('${r.id}')">xóa</button></td>
+    </tr>`).join('') || '<tr><td colspan="6"><div class="empty-state"><p>Chưa có rule</p></div></td></tr>';
+  } catch(e) {}
+}
+
+async function toggleRule(id, enabled) {
+  await fetch(`${API}/api/workflow/rules/${id}`, {method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});
+  loadWorkflowRules();
+}
+
+async function deleteRule(id) {
+  if(!confirm('Xóa rule?')) return;
+  await fetch(`${API}/api/workflow/rules/${id}`, {method:'DELETE'});
+  loadWorkflowRules();
+}
+
+async function loadWorkflowRuns() {
+  try {
+    const list = await (await fetch(`${API}/api/workflow/runs?limit=50`)).json();
+    wfRunsTable.innerHTML = list.map(r => `<tr>
+      <td>${r.ruleId.slice(-10)}</td>
+      <td>${r.trigger}</td>
+      <td><span class="badge ${r.status==='success'?'badge-green':'badge-red'}">${r.status}</span></td>
+      <td>${escapeHtml(r.error||'')}</td>
+      <td>${new Date(r.timestamp).toLocaleString('vi-VN')}</td>
+    </tr>`).join('') || '<tr><td colspan="5"><div class="empty-state"><p>Chưa có run</p></div></td></tr>';
+  } catch(e) {}
+}
+
+// ====== INIT ======
+// ====== DOMAIN ======
+async function loadDomain() {
+  try {
+    const d = await (await fetch(`${API}/api/settings/domain`)).json();
+    const input = document.getElementById('domainInput');
+    const status = document.getElementById('domainStatus');
+    const preview = document.getElementById('domainPreview');
+    input.value = d.publicDomain || '';
+    if (d.publicDomain) {
+      status.textContent = 'đã cấu hình';
+      status.className = 'badge badge-green';
+    } else {
+      status.textContent = 'dùng fallback';
+      status.className = 'badge badge-yellow';
+    }
+    preview.textContent = d.publicUrl;
+  } catch(e) {}
+}
+
+async function saveDomain() {
+  const publicDomain = document.getElementById('domainInput').value.trim();
+  try {
+    const r = await fetch(`${API}/api/settings/domain`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({publicDomain})});
+    const d = await r.json();
+    toast(`✅ Domain: ${d.publicUrl}`);
+    loadDomain();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadEmailProvider() {
+  try {
+    const d = await (await fetch(`${API}/api/settings/email`)).json();
+    const p = document.getElementById('emlProvider');
+    if (p) p.value = d.provider || 'resend';
+    const f = document.getElementById('emlFrom');
+    if (f) f.value = d.fromEmail || '';
+    const st = document.getElementById('emlStatus');
+    const km = document.getElementById('emlKeyMasked');
+    if (d.hasApiKey) { st.textContent = 'đã kết nối'; st.className = 'badge badge-green'; }
+    else { st.textContent = 'chưa có key'; st.className = 'badge badge-yellow'; }
+    if (km) km.textContent = d.apiKeyMasked || '—';
+  } catch(e) {}
+}
+
+async function saveEmailProvider() {
+  const provider = document.getElementById('emlProvider').value;
+  const apiKey = document.getElementById('emlApiKey').value;
+  const fromEmail = document.getElementById('emlFrom').value.trim();
+  const body = { provider, fromEmail };
+  if (apiKey) body.apiKey = apiKey;
+  try {
+    const r = await fetch(`${API}/api/settings/email`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) { toast(d.error || 'Lỗi','error'); return; }
+    toast(`✅ Đã lưu: ${d.provider || 'resend'}`);
+    document.getElementById('emlApiKey').value = '';
+    loadEmailProvider();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function testEmailProvider() {
+  const to = document.getElementById('emlTestTo').value.trim();
+  if (!to) { toast('Nhập email nhận test','error'); return; }
+  toast('Đang gửi test...');
+  try {
+    const r = await fetch(`${API}/api/email/provider/test`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to})});
+    const d = await r.json();
+    if (r.ok) toast(`✅ Test OK (${d.provider}) id: ${d.id||'—'}`);
+    else toast(d.error || 'Test thất bại','error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function loadSepay() {
+  try {
+    const d = await (await fetch(`${API}/api/payment/sepay/config`)).json();
+    const st = document.getElementById('sepStatus');
+    const tok = document.getElementById('sepTokenMask');
+    const url = document.getElementById('sepWhUrl');
+    if (d.hasToken) { st.textContent = 'đã kết nối'; st.className = 'badge badge-green'; }
+    else { st.textContent = 'chưa có token'; st.className = 'badge badge-yellow'; }
+    if (tok) tok.textContent = d.hasToken ? '(đã lưu)' : '—';
+    if (url) url.textContent = d.webhookUrl;
+    if (!document.getElementById('sepApiUrl').value && d.apiUrl) document.getElementById('sepApiUrl').value = d.apiUrl;
+    if (d.hasToken) loadSepayTxns();
+  } catch(e) {}
+}
+
+async function loadSepayTxns() {
+  try {
+    const d = await (await fetch(`${API}/api/payment/sepay/transactions?limit=10`)).json();
+    const rows = (d.transactions||[]).map(t => `
+      <tr><td>${escapeHtml((t.transaction_date||'').replace(' ','<br>'))}</td><td>${escapeHtml(t.account_number||'')}</td>
+      <td>${vnd(t.amount_in||0)}</td><td>${escapeHtml(t.transaction_content||'')}</td><td>${escapeHtml(t.code||'')}</td></tr>`);
+    document.getElementById('sepTxnTable').innerHTML = rows.join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text2)">Chưa có giao dịch</td></tr>';
+  } catch(e) { document.getElementById('sepTxnTable').innerHTML = `<tr><td colspan="5" style="color:#e74c3c">${escapeHtml(e.message||'Lỗi')}</td></tr>`; }
+}
+
+async function saveSepay() {
+  const token = document.getElementById('sepToken').value;
+  const webhookSecret = document.getElementById('sepWhSecret').value;
+  const apiUrl = document.getElementById('sepApiUrl').value.trim();
+  const body = {};
+  if (token) body.token = token;
+  if (webhookSecret) body.webhookSecret = webhookSecret;
+  if (apiUrl) body.apiUrl = apiUrl;
+  try {
+    const r = await fetch(`${API}/api/settings/sepay`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) { toast(d.error || 'Lỗi','error'); return; }
+    toast('✅ Đã lưu cấu hình SePay');
+    document.getElementById('sepToken').value = '';
+    document.getElementById('sepWhSecret').value = '';
+    loadSepay();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function testSepay() {
+  toast('Đang test SePay...');
+  try {
+    const r = await fetch(`${API}/api/payment/sepay/test`, {method:'POST'});
+    const d = await r.json();
+    if (r.ok) toast(`✅ Kết nối OK — ${d.total} tài khoản`);
+    else toast(d.error || 'Test thất bại','error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function createSepayWebhook() {
+  const bankAccountId = document.getElementById('sepBankAcct').value.trim();
+  const body = { name: 'VinPeti CRM' };
+  if (bankAccountId) body.bankAccountId = Number(bankAccountId);
+  try {
+    const r = await fetch(`${API}/api/payment/sepay/webhook`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (r.ok) toast(`✅ Đã tạo webhook #${d.webhook?.id||'?'}`);
+    else toast(d.error || 'Tạo webhook thất bại','error');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+checkHealth();
+loadPresets();
+setInterval(checkHealth, 30000);
+</script>
+</body>
+</html>
