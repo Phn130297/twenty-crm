@@ -617,7 +617,7 @@ render(DATA);
 <p>Mọi thắc mắc vui lòng trả lời email này hoặc liên hệ: <strong>phanhuunghi@gmail.com</strong></p>
 <p>Trân trọng,<br>BS. Phan Hữu Nghị</p>`;
     const result = await sendEmail({ to: email, subject: `Ebook "AI Trong Thuc Hanh Lam Sang Thu Y" - ${ten}`, html, attachments: attachment ? [attachment] : undefined });
-    if (!result.success) return res.status(500).json({ error: result.error || 'Send failed' });
+    if (!result.success) return res.status(500).json({ error: (result as any).error || 'Send failed' });
     res.json({ success: true, to: email, id: result.id, attachment: !!attachment });
   });
 

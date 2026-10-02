@@ -30,7 +30,7 @@ export function registerCrmTools(
 
   toolHandlers.set('crm_list_contacts', async (args) => {
     try {
-      const data = await client.getContacts(String(args.search || ''), Number(args.limit || 20));
+      const data = await client.getContacts(Number(args.limit || 20));
       return { content: [{ type: 'text', text: JSON.stringify(data) }] };
     } catch (e: any) { return fail(e.message); }
   });
